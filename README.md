@@ -7,6 +7,58 @@ Run Quality Assurance tests against an API endpoint
 
 TODO
 
+## Configuration
+
+To execute aqpi against an endpoint, run the following command:
+
+```
+$ qapi -c PATH_TO_A_CONFIG.yaml
+```
+
+The config file provides qapi with a set of instructions. These instructions are simply a list of requests to make and some initial configuration to use when making those requests. Here's an annotated example config file.
+
+``` yaml
+# Configuration variables that are known to qapi and provide special meaning.
+environment:
+	# The URL from which all other URLs will be built.
+  base_url: http://localhost:8080/api
+
+# A collection of runtime variables that will be used to further configure
+# qapi. Any variables obtained from extractors will be added to this collection.
+variables:
+  username: un
+  password: pw
+
+# A collection of requests to perform agains the API.
+requests:
+	# A request to perform. The header, path, and body parts can be parameterised
+	# with variables.
+  - name: login
+    headers:
+      Content-Type: application/json
+    method: POST
+    path: "/login"
+    body: |
+      {
+        "username": "{{username}}",
+        "password": "{{password}}"
+      }
+		# A collection of extractors, used to extract values from API responses.
+    extractors:
+			# A JSON extractor, that selects id, and token values from a top-level
+			# "result" object and applies them to the runtime variables collection.
+      - type: json
+        selectors:
+          id: result.id
+          token: result.token
+  
+  - name: get
+    method: GET
+    path: "/get/{{id}}"
+    headers:
+      Authorisation: Bearer {{token}}
+```
+
 ## Examples
 
 #### Login
