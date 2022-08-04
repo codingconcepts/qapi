@@ -20,7 +20,7 @@ The config file provides qapi with a set of instructions. These instructions are
 ``` yaml
 # Configuration variables that are known to qapi and provide special meaning.
 environment:
-	# The URL from which all other URLs will be built.
+  # The URL from which all other URLs will be built.
   base_url: http://localhost:8080/api
 
 # A collection of runtime variables that will be used to further configure
