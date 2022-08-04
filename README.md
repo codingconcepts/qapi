@@ -1,3 +1,5 @@
+# ![datagen logo](assets/cover.png)
+
 # qapi
 Run Quality Assurance tests against an API endpoint
 
