@@ -31,8 +31,8 @@ variables:
 
 # A collection of requests to perform agains the API.
 requests:
-	# A request to perform. The header, path, and body parts can be parameterised
-	# with variables.
+  # A request to perform. The header, path, and body parts can be parameterised
+  # with variables.
   - name: login
     headers:
       Content-Type: application/json
@@ -43,10 +43,10 @@ requests:
         "username": "{{username}}",
         "password": "{{password}}"
       }
-		# A collection of extractors, used to extract values from API responses.
+    # A collection of extractors, used to extract values from API responses.
     extractors:
-			# A JSON extractor, that selects id, and token values from a top-level
-			# "result" object and applies them to the runtime variables collection.
+      # A JSON extractor, that selects id, and token values from a top-level
+      # "result" object and applies them to the runtime variables collection.
       - type: json
         selectors:
           id: result.id
