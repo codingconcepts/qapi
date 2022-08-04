@@ -23,9 +23,9 @@ if file_path == ""
 end
 
 yaml = File.open(file_path)
-web_call = Config.from_yaml(yaml)
+config = Config.from_yaml(yaml)
 
-make_requests(web_call)
+make_requests(config)
 
 def make_requests(c : Config)
   c.requests.each do |r|
