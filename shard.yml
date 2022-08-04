@@ -1,0 +1,17 @@
+name: qapi
+version: 0.1.0
+
+authors:
+  - Coding Concepts <hello@robreid.io>
+
+targets:
+  qapi:
+    main: src/qapi.cr
+
+crystal: 1.5.0
+
+license: MIT
+
+dependencies:
+  kemal:
+    github: kemalcr/kemal

@@ -1,0 +1,29 @@
+environment:
+  base_url: http://localhost:8080/api
+
+variables:
+  username: un
+  password: pw
+
+requests:
+  - name: login
+    headers:
+      Content-Type: application/json
+    method: POST
+    path: "/login"
+    body: |
+      {
+        "username": "{{username}}",
+        "password": "{{password}}"
+      }
+    extractors:
+      - type: json
+        selectors:
+          id: result.id
+          token: result.token
+  
+  - name: get
+    method: GET
+    path: "/get/{{id}}"
+    headers:
+      Authorisation: Bearer {{token}}
