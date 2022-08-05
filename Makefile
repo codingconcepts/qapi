@@ -14,3 +14,6 @@ login_example:
 build: validate_version
 	crystal build src/qapi.cr --release -o ./build/qapi
 	(cd build && tar -zcvf qapi_${VERSION}_macos.tar.gz ./qapi)
+
+test:
+	crystal spec -p
