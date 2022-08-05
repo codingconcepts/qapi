@@ -7,4 +7,4 @@ variables:
 requests:
   - name: get
     method: GET
-    path: "/endpoint/{{id}}"
+    path: /endpoint/{{id}}

@@ -7,6 +7,6 @@ variables:
 requests:
   - name: get
     method: GET
-    path: "/endpoint"
+    path: /endpoint
     headers:
       Authorization: Bearer {{token}}

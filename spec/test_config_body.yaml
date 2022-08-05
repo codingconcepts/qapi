@@ -10,7 +10,7 @@ requests:
     headers:
       Content-Type: application/json
     method: POST
-    path: "/endpoint"
+    path: /endpoint
     body: |
       {
         "username": "{{username}}",
