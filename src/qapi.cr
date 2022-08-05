@@ -5,7 +5,6 @@ require "option_parser"
 require "uri"
 require "yaml"
 
-require "../src/model/config"
 require "../src/execution/runner"
 
 file_path = ""
