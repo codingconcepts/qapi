@@ -1,47 +1,60 @@
+require "yaml"
+
 require "../model/*"
 
 module Execution
   class Runner
-    def make_requests(c : Model::Config)
-      c.requests.each do |r|
+    include YAML::Serializable
+  
+    @[YAML::Field(key: "environment")]
+    property environment : Model::Environment
+  
+    @[YAML::Field(key: "variables")]
+    property variables : Hash(String, String)
+  
+    @[YAML::Field(key: "requests")]
+    property requests : Array(Model::Request)
+
+    def start()
+      requests.each do |r|
         Log.info &.emit("request", name: r.name)
     
         elapsed = Time.measure do
-          make_request(c, r)
+          make_request(r)
         end
   
         Log.debug &.emit("request", elapsed_time: "#{elapsed.total_milliseconds}ms")
       end
     end
 
-    def make_request(c : Model::Config, r : Model::Request)
-      url = add_variables(c, r.path)
-      body = add_variables(c, r.body || "")
-      headers = attach_headers(c, r)
+    def make_request(r : Model::Request)
+      url = add_variables(r.path)
+      body = add_variables(r.body || "")
+      headers = attach_headers(r)
     
-      uri = URI.parse Path.new(c.environment.base_url, url).to_s
+      uri = URI.parse Path.new(environment.base_url, url).to_s
       resp = HTTP::Client.exec(r.method, uri, headers, body)
       raise "#{resp.body}" if resp.status_code != 200
     
-      run_extractors(c, r, resp)
+      run_extractors(r, resp)
     end
     
-    def add_variables(c : Model::Config, s : String) : String
+    def add_variables(s : String) : String
       matches = s.scan(/{{\w+}}/).map(&.[0])
       matches.each do |m|
-        s = s.gsub(m, c.variables[m.strip("{}")])
+        s = s.gsub(m, variables[m.strip("{}")])
       end
     
       s
     end
     
-    def attach_headers(c : Model::Config, r : Model::Request) : HTTP::Headers
+    def attach_headers(r : Model::Request) : HTTP::Headers
       headers = HTTP::Headers.new
       return headers if !r.headers
     
       h = r.headers.not_nil!
       h.each do |k, v|
-        h[k] = add_variables(c, v)
+        h[k] = add_variables(v)
       end
     
       headers.merge! h
@@ -49,18 +62,18 @@ module Execution
       headers
     end
     
-    def run_extractors(c : Model::Config, r : Model::Request, resp : HTTP::Client::Response)
+    def run_extractors(r : Model::Request, resp : HTTP::Client::Response)
       return if !r.extractors
     
       r.extractors.not_nil!.each do |e|
         case e.type
         when "json"
-          run_json_extractor(c, e.selectors, resp)
+          run_json_extractor(e.selectors, resp)
         end
       end
     end
     
-    def run_json_extractor(c : Model::Config, selectors : Hash(String, String), resp : HTTP::Client::Response)
+    def run_json_extractor(selectors : Hash(String, String), resp : HTTP::Client::Response)
       body = JSON.parse(resp.body)
     
       selectors.each do |sk, dot_path|
@@ -69,7 +82,7 @@ module Execution
           b = b[part]
         end
     
-        c.variables[sk] = b.to_s
+        variables[sk] = b.to_s
       end
     end
   end

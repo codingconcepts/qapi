@@ -26,7 +26,6 @@ if file_path == ""
 end
 
 yaml = File.open(file_path)
-config = Model::Config.from_yaml(yaml)
 
-runner = Execution::Runner.new()
-runner.make_requests(config)
+runner = Execution::Runner.from_yaml(yaml)
+runner.start()
