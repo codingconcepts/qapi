@@ -1,0 +1,10 @@
+environment:
+  base_url: http://localhost:8080/test
+
+variables:
+  id: some_id
+
+requests:
+  - name: get
+    method: GET
+    path: "/endpoint/{{id}}"

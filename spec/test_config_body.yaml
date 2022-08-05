@@ -1,0 +1,22 @@
+environment:
+  base_url: http://localhost:8080/test
+
+variables:
+  username: un
+  password: pw
+
+requests:
+  - name: login
+    headers:
+      Content-Type: application/json
+    method: POST
+    path: "/endpoint"
+    body: |
+      {
+        "username": "{{username}}",
+        "password": "{{password}}"
+      }
+    extractors:
+      - type: json
+        selectors:
+          result: result

@@ -1,0 +1,12 @@
+environment:
+  base_url: http://localhost:8080/test
+
+variables:
+  token: some_token
+
+requests:
+  - name: get
+    method: GET
+    path: "/endpoint"
+    headers:
+      Authorization: Bearer {{token}}
