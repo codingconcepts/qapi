@@ -3,3 +3,7 @@
 /bin/
 /.shards/
 *.dwarf
+/build/
+
+# macos
+.DS_Store
