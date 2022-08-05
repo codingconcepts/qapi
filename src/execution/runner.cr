@@ -6,11 +6,11 @@ module Execution
       c.requests.each do |r|
         Log.info &.emit("request", name: r.name)
     
-          elapsed = Time.measure do
-              make_request(c, r)
-          end
+        elapsed = Time.measure do
+          make_request(c, r)
+        end
   
-          Log.debug &.emit("request", elapsed_time: "#{elapsed.total_milliseconds}ms")
+        Log.debug &.emit("request", elapsed_time: "#{elapsed.total_milliseconds}ms")
       end
     end
 
@@ -19,7 +19,7 @@ module Execution
       body = add_variables(c, r.body || "")
       headers = attach_headers(c, r)
     
-        uri = URI.parse Path.new(c.environment.base_url, url).to_s
+      uri = URI.parse Path.new(c.environment.base_url, url).to_s
       resp = HTTP::Client.exec(r.method, uri, headers, body)
       raise "#{resp.body}" if resp.status_code != 200
     

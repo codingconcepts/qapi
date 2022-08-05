@@ -1,4 +1,4 @@
-require "json"
+require "yaml"
 
 module Model
   class Config
