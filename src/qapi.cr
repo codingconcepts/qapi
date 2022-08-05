@@ -6,7 +6,7 @@ require "uri"
 require "yaml"
 
 require "../src/model/config"
-require "../src/runner/runner"
+require "../src/execution/runner"
 
 file_path = ""
 
@@ -28,4 +28,5 @@ end
 yaml = File.open(file_path)
 config = Model::Config.from_yaml(yaml)
 
-Runner.make_requests(config)
+runner = Execution::Runner.new()
+runner.make_requests(config)
