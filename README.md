@@ -1,7 +1,9 @@
 # ![datagen logo](assets/cover.png)
 
 # qapi
-Run Quality Assurance tests against an API endpoint
+Run Quality Assurance tests against an API endpoint.
+
+The name qapi is a portmanteau of the initialisms QA and API. To pronounce it, simply say the letters "Q-A-P-I".
 
 ## Installation
 
