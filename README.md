@@ -13,15 +13,33 @@ $ go get -u github.com/codingconcepts/qapi
 
 #### From binary
 
-Coming soon.
+1. Download the tar file that matches your OS from the [release page](https://github.com/codingconcepts/qapi/releases).
+1. Extract the file (and optionally add it into your path).
+1. Run the command from the command line.
+
+## Usage
+
+Display application help:
+```
+$ qapi -h 
+  -config string
+        absolution or relative path to the config file
+  -version
+        show the version
+```
+
+Display application version:
+```
+$ qapi -version
+0.1.0
+```
+
+Run the application with a [configuration file](#configuration):
+```
+$ qapi -config PATH_TO_YOUR_CONFIG.yaml
+```
 
 ## Configuration
-
-To execute aqpi against an endpoint, run the following command:
-
-```
-$ qapi -c PATH_TO_A_CONFIG.yaml
-```
 
 The config file provides qapi with a set of instructions. These instructions are simply a list of requests to make and some initial configuration to use when making those requests. Here's an annotated example config file.
 
