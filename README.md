@@ -108,8 +108,8 @@ go run examples/login/server.go
 
 ```
 $ make login_example
-go run qapi.go -config examples/login/config.yaml
 
+go run qapi.go -config examples/login/config.yaml
 [request] login
 [request] get
 ```
