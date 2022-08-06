@@ -80,21 +80,16 @@ To execute the login example, run the following commands in different terminal w
 
 ```
 $ make login_example_server
-crystal examples/login/server.cr
 
-[development] Kemal is ready to lead at http://0.0.0.0:8080
-"un"
-"pw"
-2022-08-04 18:08:07 UTC 200 POST /api/login 162.82µs
-HTTP::Headers{"Authorisation" => "Bearer MXU01u5KSMQ0SCNL4/6AFuP+DhZ7AoXWTIfmd7gl6Sp6vJQn0C2w6A/NsqZoBeGnZpw", "Connection" => "close", "Content-Length" => "0", "Host" => "localhost:8080", "User-Agent" => "Crystal", "Accept-Encoding" => "gzip, deflate"}
-"4977feb8-fac2-4c2a-b608-771ae8b0f081"
-2022-08-04 18:08:07 UTC 200 GET /api/get/4977feb8-fac2-4c2a-b608-771ae8b0f081 572.22µs
+go run examples/login/server.go
+2022/08/06 16:00:49 map[token:4977feb8-fac2-4c2a-b608-771ae8b0f081]
+2022/08/06 16:00:49 map[Accept-Encoding:[gzip] Authorisation:[Bearer MXU01u5KSMQ0SCNL4/6AFuP+DhZ7AoXWTIfmd7gl6Sp6vJQn0C2w6A/NsqZoBeGnZpw] User-Agent:[Go-http-client/1.1]]
 ```
 
 ```
 $ make login_example
-crystal src/qapi.cr -c examples/login/config.yaml
+go run qapi.go -config examples/login/config.yaml
 
-2022-08-04T18:08:07.889369Z   INFO - request -- name: "login"
-2022-08-04T18:08:07.893480Z   INFO - request -- name: "get"
+[request] login
+[request] get
 ```
