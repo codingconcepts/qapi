@@ -14,6 +14,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+// Runner holds the runtime configuration for the application.
 type Runner struct {
 	Environment models.Environment `yaml:"environment"`
 	Variables   map[string]string  `yaml:"variables"`
@@ -22,6 +23,7 @@ type Runner struct {
 	Client *http.Client
 }
 
+// Start making requests.
 func (r *Runner) Start() error {
 	r.Client = &http.Client{
 		Timeout: time.Second * 5,
