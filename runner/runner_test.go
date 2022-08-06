@@ -11,10 +11,10 @@ import (
 
 func TestRunner_Start(t *testing.T) {
 	cases := []struct {
-		name      string
-		variables map[string]string
-		request   models.Request
-		// TODO: Add assertion for post-request variables.
+		name              string
+		variables         map[string]string
+		request           models.Request
+		expectedVariables map[string]string
 	}{
 		{
 			name: "request with headers",
@@ -54,6 +54,24 @@ func TestRunner_Start(t *testing.T) {
 				Body: `{"username": "{{username}}", "password": "{{password}}"}`,
 			},
 		},
+		{
+			name: "request with json body extraction",
+			request: models.Request{
+				Method: http.MethodGet,
+				Path:   "/extract",
+				Extractors: []models.Extractor{
+					{
+						Type: "json",
+						Selectors: map[string]string{
+							"value": "a.b.c",
+						},
+					},
+				},
+			},
+			expectedVariables: map[string]string{
+				"value": "hello",
+			},
+		},
 	}
 
 	defer gock.Off()
@@ -68,6 +86,11 @@ func TestRunner_Start(t *testing.T) {
 		Reply(200)
 
 	gock.New("http://localhost:8080/test").
+		Get("/extract").
+		Reply(200).
+		BodyString(`{"a": {"b": {"c": "hello"}}}`)
+
+	gock.New("http://localhost:8080/test").
 		Post("/body").
 		MatchType("json").
 		JSON(map[string]string{"username": "un", "password": "pw"}).
@@ -79,6 +102,12 @@ func TestRunner_Start(t *testing.T) {
 
 			err := runner.Start()
 			assert.NoError(t, err)
+
+			if c.expectedVariables != nil {
+				for k, v := range c.expectedVariables {
+					assert.Equal(t, v, runner.Variables[k])
+				}
+			}
 		})
 	}
 }

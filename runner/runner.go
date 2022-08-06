@@ -27,6 +27,10 @@ func (r *Runner) Start() error {
 		Timeout: time.Second * 5,
 	}
 
+	if r.Variables == nil {
+		r.Variables = map[string]string{}
+	}
+
 	for _, req := range r.Requests {
 		log.Printf("[request] %s", req.Name)
 		if err := r.runRequest(req); err != nil {
