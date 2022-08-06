@@ -5,7 +5,15 @@ Run Quality Assurance tests against an API endpoint
 
 ## Installation
 
-TODO
+#### From source
+
+```
+$ go get -u github.com/codingconcepts/qapi
+```
+
+#### From binary
+
+Coming soon.
 
 ## Configuration
 

@@ -6,14 +6,20 @@ ifndef VERSION
 endif
 
 login_example_server:
-	crystal examples/login/server.cr
+	go run examples/login/server.go
 
 login_example:
-	crystal src/qapi.cr -c examples/login/config.yaml
+	go run qapi.go -config examples/login/config.yaml
 
-build: validate_version
-	crystal build src/qapi.cr --release -o ./build/qapi
-	(cd build && tar -zcvf qapi_${VERSION}_macos.tar.gz ./qapi)
+release: validate_version
+	GOOS=linux go build -ldflags "-X main.version=${VERSION}" -o build/aqpi
+	(cd build && tar -zcvf aqpi_${VERSION}_linux.tar.gz ./aqpi)
+
+	GOOS=darwin go build -ldflags "-X main.version=${VERSION}" -o build/aqpi
+	(cd build && tar -zcvf aqpi_${VERSION}_macos.tar.gz ./aqpi)
+
+	GOOS=windows go build -ldflags "-X main.version=${VERSION}" -o build/aqpi
+	(cd build && tar -zcvf aqpi_${VERSION}_windows.tar.gz ./aqpi)
 
 test:
-	crystal spec -p
+	go test ./... -v -cover
