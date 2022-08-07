@@ -16,23 +16,27 @@ import (
 
 // Runner holds the runtime configuration for the application.
 type Runner struct {
-	Environment models.Environment `yaml:"environment"`
-	Variables   map[string]string  `yaml:"variables"`
-	Requests    []models.Request   `yaml:"requests"`
-
+	*models.Config
 	Client *http.Client
 }
 
-// Start making requests.
-func (r *Runner) Start() error {
-	r.Client = &http.Client{
-		Timeout: time.Second * 5,
+func New(c *models.Config) *Runner {
+	r := Runner{
+		Config: c,
+		Client: &http.Client{
+			Timeout: time.Second * 5,
+		},
 	}
 
 	if r.Variables == nil {
 		r.Variables = map[string]string{}
 	}
 
+	return &r
+}
+
+// Start making requests.
+func (r *Runner) Start() error {
 	for _, req := range r.Requests {
 		log.Printf("[request] %s", req.Name)
 		if err := r.runRequest(req); err != nil {

@@ -98,7 +98,15 @@ func TestRunner_Start(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			runner := createRunner(c.variables, c.request)
+			runner := New(&models.Config{
+				Environment: models.Environment{
+					BaseURL: "http://localhost:8080/test",
+				},
+				Variables: c.variables,
+				Requests: []models.Request{
+					c.request,
+				},
+			})
 
 			err := runner.Start()
 			assert.NoError(t, err)
@@ -109,15 +117,5 @@ func TestRunner_Start(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-
-func createRunner(variables map[string]string, req models.Request) *Runner {
-	return &Runner{
-		Environment: models.Environment{
-			BaseURL: "http://localhost:8080/test",
-		},
-		Variables: variables,
-		Requests:  []models.Request{req},
 	}
 }
