@@ -25,7 +25,7 @@ Display application help:
 ```
 $ qapi -h 
   -config string
-        absolution or relative path to the config file
+        absolute or relative path to the config file
   -version
         show the version
 ```
