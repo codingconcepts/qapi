@@ -17,7 +17,8 @@ import (
 // Runner holds the runtime configuration for the application.
 type Runner struct {
 	*models.Config
-	Client *http.Client
+	Client              *http.Client
+	assertionValidators map[string]models.Validator
 }
 
 func New(c *models.Config) *Runner {
@@ -30,6 +31,11 @@ func New(c *models.Config) *Runner {
 
 	if r.Variables == nil {
 		r.Variables = map[string]string{}
+	}
+
+	r.assertionValidators = map[string]models.Validator{
+		"is_not_null": models.ValidateIsNotNull,
+		"is_uuid":     models.ValidateIsUUID,
 	}
 
 	return &r
@@ -71,11 +77,23 @@ func (r *Runner) runRequest(req models.Request) error {
 		return fmt.Errorf("making request: %w", err)
 	}
 
-	return r.extractVariables(req.Extractors, resp)
+	if err = r.extractVariables(req.Extractors, resp); err != nil {
+		return fmt.Errorf("extracting variables: %w", err)
+	}
+
+	if err = r.assertVariables(req.Assertions); err != nil {
+		return fmt.Errorf("asserting variables: %w", err)
+	}
+
+	return nil
 }
 
 func (r *Runner) extractVariables(extractors []models.Extractor, resp *http.Response) error {
 	for _, e := range extractors {
+		for k, v := range e.Selectors {
+			log.Printf("\t[extract] %v from %s", k, v)
+		}
+
 		switch strings.ToLower(e.Type) {
 		case "json":
 			return r.extractVariablesBodyJSON(e, resp)
@@ -98,6 +116,24 @@ func (r *Runner) extractVariablesBodyJSON(extractor models.Extractor, resp *http
 		value := gjson.Get(body, v)
 		if value.Exists() {
 			r.Variables[k] = value.String()
+		}
+	}
+
+	return nil
+}
+
+func (r *Runner) assertVariables(assertions []models.Assertion) error {
+	for _, a := range assertions {
+		log.Printf("\t[assert] %s %s", a.Variable, a.Type)
+
+		validator, ok := r.assertionValidators[a.Type]
+		if !ok {
+			return fmt.Errorf("missing validator for assertion: %q", a.Type)
+		}
+
+		variable := strings.Trim(a.Variable, "{}")
+		if err := validator(variable, r.Variables); err != nil {
+			return fmt.Errorf("assertion failed: %w", err)
 		}
 	}
 

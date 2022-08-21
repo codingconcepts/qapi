@@ -9,4 +9,5 @@ type Request struct {
 	Path       string            `yaml:"path"`
 	Body       string            `yaml:"body"`
 	Extractors []Extractor       `yaml:"extractors"`
+	Assertions []Assertion       `yaml:"assertions"`
 }
