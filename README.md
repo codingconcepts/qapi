@@ -79,6 +79,12 @@ requests:
         selectors:
           id: result.id
           token: result.token
+    # A collection assertions, used to perform assertons against extracted variables.
+    assertions:
+      - type: is_not_null
+        variable: "{{id}}"
+      - type: is_uuid
+        variable: "{{id}}"
   
   - name: get
     method: GET
