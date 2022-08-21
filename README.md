@@ -119,3 +119,9 @@ go run qapi.go -config examples/login/config.yaml
 [request] login
 [request] get
 ```
+
+## Roadmap
+
+- [ ] Support for gRPC services
+- [ ] Support for GraphQL services
+- [ ] Support for multiple input files / directory
