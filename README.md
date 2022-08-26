@@ -122,6 +122,6 @@ go run qapi.go -config examples/login/config.yaml
 
 ## Roadmap
 
-- [ ] Support for gRPC services
+- [ ] Support for gRPC services (look into https://github.com/fullstorydev/grpcurl/blob/master/grpcurl.go)
 - [ ] Support for GraphQL services
 - [ ] Support for multiple input files / directory
