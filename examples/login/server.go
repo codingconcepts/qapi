@@ -14,7 +14,7 @@ func main() {
 	router.HandleFunc("/api/get/{token}", handleGet).Methods(http.MethodGet)
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":3000",
 		Handler: router,
 	}
 
@@ -22,16 +22,18 @@ func main() {
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
+	log.Printf("[handle login]")
+
 	defer r.Body.Close()
 
-	var request map[string]interface{}
+	var request map[string]any
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"result": map[string]interface{}{
+	json.NewEncoder(w).Encode(map[string]any{
+		"result": map[string]any{
 			"token": "MXU01u5KSMQ0SCNL4/6AFuP+DhZ7AoXWTIfmd7gl6Sp6vJQn0C2w6A/NsqZoBeGnZpw",
 			"id":    "4977feb8-fac2-4c2a-b608-771ae8b0f081",
 		},
@@ -39,6 +41,8 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGet(w http.ResponseWriter, r *http.Request) {
+	log.Printf("[handle get]")
+
 	vars := mux.Vars(r)
 	log.Println(vars)
 	log.Println(r.Header)

@@ -3,8 +3,10 @@ package runner
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/codingconcepts/qapi/models"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -12,13 +14,13 @@ import (
 func TestRunner_Start(t *testing.T) {
 	cases := []struct {
 		name              string
-		variables         map[string]string
+		variables         map[string]any
 		request           models.Request
 		expectedVariables map[string]string
 	}{
 		{
 			name: "request with headers",
-			variables: map[string]string{
+			variables: map[string]any{
 				"token": "some_token",
 			},
 			request: models.Request{
@@ -31,7 +33,7 @@ func TestRunner_Start(t *testing.T) {
 		},
 		{
 			name: "request with url params",
-			variables: map[string]string{
+			variables: map[string]any{
 				"id": "some_id",
 			},
 			request: models.Request{
@@ -41,7 +43,7 @@ func TestRunner_Start(t *testing.T) {
 		},
 		{
 			name: "request with body",
-			variables: map[string]string{
+			variables: map[string]any{
 				"username": "un",
 				"password": "pw",
 			},
@@ -56,6 +58,24 @@ func TestRunner_Start(t *testing.T) {
 		},
 		{
 			name: "request with json body extraction",
+			request: models.Request{
+				Method: http.MethodGet,
+				Path:   "/extract",
+				Extractors: []models.Extractor{
+					{
+						Type: "json",
+						Selectors: map[string]string{
+							"value": "a.b.c",
+						},
+					},
+				},
+			},
+			expectedVariables: map[string]string{
+				"value": "hello",
+			},
+		},
+		{
+			name: "request with json array body extraction",
 			request: models.Request{
 				Method: http.MethodGet,
 				Path:   "/extract",
@@ -96,9 +116,11 @@ func TestRunner_Start(t *testing.T) {
 		JSON(map[string]string{"username": "un", "password": "pw"}).
 		Reply(200)
 
+	events := make(chan models.RequestResult, 1)
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			runner := New(&models.Config{
+			runner := New(models.Config{
 				Environment: models.Environment{
 					BaseURL: "http://localhost:8080/test",
 				},
@@ -106,7 +128,7 @@ func TestRunner_Start(t *testing.T) {
 				Requests: []models.Request{
 					c.request,
 				},
-			})
+			}, time.Second, events, &zerolog.Logger{})
 
 			err := runner.Start()
 			assert.NoError(t, err)
@@ -116,6 +138,8 @@ func TestRunner_Start(t *testing.T) {
 					assert.Equal(t, v, runner.Variables[k])
 				}
 			}
+
+			assert.Equal(t, 200, <-events)
 		})
 	}
 }

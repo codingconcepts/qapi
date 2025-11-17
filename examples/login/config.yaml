@@ -1,11 +1,11 @@
 environment:
-  base_url: http://localhost:8080/api
+  base_url: http://localhost:3000/api
 
 variables:
   username: un
   password: pw
 
-requests:
+setup_requests:
   - name: login
     headers:
       Content-Type: application/json
@@ -26,7 +26,11 @@ requests:
         variable: "{{id}}"
       - type: is_uuid
         variable: "{{id}}"
-  
+      - type: is_not_null
+        variable: "{{token}}"
+
+request_frequency: 1s
+requests:
   - name: get
     method: GET
     path: "/get/{{id}}"

@@ -6,9 +6,9 @@ import (
 	"github.com/google/uuid"
 )
 
-type Validator func(key string, variables map[string]string) error
+type Validator func(key string, variables map[string]any) error
 
-func fetchAndValidate(key string, variables map[string]string) (string, error) {
+func fetchAndValidate(key string, variables map[string]any) (any, error) {
 	value, ok := variables[key]
 	if !ok {
 		return "", fmt.Errorf("variable missing: %q", key)
@@ -17,7 +17,7 @@ func fetchAndValidate(key string, variables map[string]string) (string, error) {
 	return value, nil
 }
 
-func ValidateIsNotNull(key string, variables map[string]string) error {
+func ValidateIsNotNull(key string, variables map[string]any) error {
 	value, err := fetchAndValidate(key, variables)
 	if err != nil {
 		return err
@@ -30,12 +30,14 @@ func ValidateIsNotNull(key string, variables map[string]string) error {
 	return nil
 }
 
-func ValidateIsUUID(key string, variables map[string]string) error {
+func ValidateIsUUID(key string, variables map[string]any) error {
 	value, err := fetchAndValidate(key, variables)
 	if err != nil {
 		return err
 	}
 
-	_, err = uuid.Parse(value)
+	valueString := fmt.Sprintf("%v", value)
+
+	_, err = uuid.Parse(valueString)
 	return err
 }
