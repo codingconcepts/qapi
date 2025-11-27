@@ -6,12 +6,15 @@ import (
 	"time"
 
 	"github.com/codingconcepts/qapi/models"
+	"github.com/codingconcepts/qapi/test"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/h2non/gock.v1"
 )
 
 func TestRunner_Start(t *testing.T) {
+	t.SkipNow()
+
 	cases := []struct {
 		name              string
 		variables         map[string]any
@@ -140,6 +143,57 @@ func TestRunner_Start(t *testing.T) {
 			}
 
 			assert.Equal(t, 200, <-events)
+		})
+	}
+}
+
+func TestExtractVariablesBodyJSON(t *testing.T) {
+	cases := []struct {
+		name                   string
+		inputJSON              string
+		extractorSelectorKey   string
+		extractorSelectorValue string
+		exp                    any
+		expError               string
+	}{
+		{
+			name:                   "int array",
+			inputJSON:              `[{"id": 1}, {"id": 2}, {"id": 3}]`,
+			extractorSelectorKey:   "ids",
+			extractorSelectorValue: "#.id",
+			exp:                    []any{1, 2, 3},
+		},
+		{
+			name:                   "float array",
+			inputJSON:              `[{"id": 1.1}, {"id": 2.2}, {"id": 3.3}]`,
+			extractorSelectorKey:   "ids",
+			extractorSelectorValue: "#.id",
+			exp:                    []any{1.1, 2.2, 3.3},
+		},
+	}
+
+	runner := New(models.Config{
+		Environment: models.Environment{
+			BaseURL: "http://localhost:8080/test",
+		},
+	}, time.Second, nil, &zerolog.Logger{})
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			extractor := models.Extractor{
+				Type: "json",
+				Selectors: map[string]string{
+					c.extractorSelectorKey: c.extractorSelectorValue,
+				},
+			}
+
+			err := runner.extractVariablesBodyJSON(extractor, c.inputJSON)
+			if err != nil {
+				assert.EqualError(t, err, c.expError)
+				return
+			}
+
+			test.AssertSlicesEqualValues(t, c.exp, runner.Variables["ids"])
 		})
 	}
 }

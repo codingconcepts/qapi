@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/google/uuid"
 )
@@ -25,6 +26,21 @@ func ValidateIsNotNull(key string, variables map[string]any) error {
 
 	if value == "" {
 		return fmt.Errorf("variable null: %q", key)
+	}
+
+	return nil
+}
+
+func ValidateIsNotEmpty(key string, variables map[string]any) error {
+	value, err := fetchAndValidate(key, variables)
+	if err != nil {
+		return err
+	}
+
+	val := reflect.ValueOf(value)
+
+	if val.Len() == 0 {
+		return fmt.Errorf("variable empty: %q", key)
 	}
 
 	return nil

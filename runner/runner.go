@@ -41,8 +41,9 @@ func New(c models.Config, d time.Duration, e chan models.RequestResult, logger *
 	}
 
 	r.assertionValidators = map[string]models.Validator{
-		"is_not_null": models.ValidateIsNotNull,
-		"is_uuid":     models.ValidateIsUUID,
+		"is_not_null":  models.ValidateIsNotNull,
+		"is_not_empty": models.ValidateIsNotEmpty,
+		"is_uuid":      models.ValidateIsUUID,
 	}
 
 	return &r
@@ -181,24 +182,33 @@ func (r *Runner) extractVariablesBodyJSON(extractor models.Extractor, body strin
 		// Support for array responses.
 		if value.IsArray() {
 			r.Variables[k] = lo.Map(value.Array(), func(r gjson.Result, _ int) any {
-				switch r.Type {
-				case gjson.Number:
-					return r.Num
-				case gjson.String:
-					return r.Str
-				default:
-					return r.Value()
-				}
+				return parseScalar(r)
 			})
 
 			return nil
 		}
 
 		// Value is a scalar.
-		r.Variables[k] = value.Value()
+		r.Variables[k] = parseScalar(value)
 	}
 
 	return nil
+}
+
+func parseScalar(r gjson.Result) any {
+	switch r.Type {
+	case gjson.Number:
+		// Special handling for floats and integers.
+		if strings.Contains(r.Raw, ".") {
+			return r.Num
+		} else {
+			return r.Int()
+		}
+	case gjson.String:
+		return r.Str
+	default:
+		return r.Value()
+	}
 }
 
 func (r *Runner) assertVariables(assertions []models.Assertion) error {

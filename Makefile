@@ -1,4 +1,4 @@
-.PHONY: build
+.PHONY: build test
 
 validate_version:
 ifndef VERSION
